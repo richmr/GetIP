@@ -7,3 +7,4 @@ Public IP is pulled from machine-friendly websites.
 Dependencies:
 - urllib2
 - socket (some functions won't work on Windows platform due to this)
+- argparse

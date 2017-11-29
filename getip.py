@@ -23,6 +23,7 @@ import argparse
 import logging
 
 #-------- My packages
+import retrip
 from getipErrors import TimeoutGetIPError, BadDataGetIPError, UnknownIPSourceGetIPError, UnknownErrGetIPError
 
 class GetIP_class:
@@ -34,6 +35,11 @@ class GetIP_class:
         self.install = args.install
         self.ipfile = args.ipfile
         self.test = args.test
+        self.list = args.list
+        self.source = args.source
+        self.ipv = "IPv6" if args.ipv6 else "IPv4"
+        
+       
         
         # initiate logger
         formatstr = '%(asctime)s:%(levelname)s -> %(message)s'
@@ -53,6 +59,21 @@ class GetIP_class:
         logging.error("OMG!!  Exception!!")
         logging.critical("Gack!")
         
+    def go(self):
+        # check for desire for list of sources
+         if (self.list):
+            print "Available IP data sources:"
+            print "--------------------------"
+            print "{}".format(retrip.retrip_list())
+            return
+        
+        # Start try block
+        try:
+            logging.debug("getip.go: Started try block")
+            currentip = retrip.retrip(self.source, self.ipv)
+        
+        
+               
         
 
 # Set up args -----------------------------
@@ -68,10 +89,12 @@ onceAnHour = 60*60
 parser.add_argument('--test', type=int, default=onceAnHour, help='Launch getip in test mode.  Getip will check the IP every t seconds.  Default is once an hour.  This also enable --debug')
 parser.add_argument('--install', action='store_true', help='Install getip.  Run as root.')
 parser.add_argument('--alertemail', type=str, help='Designate the email to receive an alert when the public IP changes')
-
+parser.add_argument('--source', type=str, default="ifconfig.me", help="Designate source of ip data.  Use --list to see a list of sources")
+parser.add_argument('--list', action='store_true', help='Get a list of possible ip data sources')
+parser.add_argument('--ipv6', action='store_true', help='Retrieve a IPv6 result, not IPv4.')
 # And GO!
 
 args = parser.parse_args()
 ipgetter = GetIP_class(args)
-ipgetter.exp()
+ipgetter.go()
 

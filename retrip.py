@@ -20,6 +20,13 @@ from getipErrors import TimeoutGetIPError, BadDataGetIPError, UnknownIPSourceGet
 
 #-------- Basic function
 
+def retrip_list():
+    """
+    Returns a list of sources available
+    """
+    slist = "ifconfig.me - IPv4 only"
+    return slist
+
 def retrip(source="ifconfig.me", ipv="IPv4"):
     """
     Wrapper to allow for alternate IP sources to be used.

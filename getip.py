@@ -36,14 +36,15 @@ class GetIP_class:
         self.test = args.test
         
         # initiate logger
-        formatstr = '%(asctime)s:%(levelname)s -> %(message)s' 
+        formatstr = '%(asctime)s:%(levelname)s -> %(message)s'
+        datefmtstr = '%m/%d/%Y %H:%M:%S'
         loglevel = logging.INFO
         if (self.debug):
             loglevel = logging.DEBUG
             # We also print to stdout in debug mode!!
-            logging.basicConfig(format=formatstr, level=loglevel, datefmt='%m/%d/%Y %I:%M:%S %p')
+            logging.basicConfig(format=formatstr, level=loglevel, datefmt=datefmtstr)
         else:
-            logging.basicConfig(format=formatstr, level=loglevel, filename=self.logfile, datefmt='%m/%d/%Y %I:%M:%S %p')
+            logging.basicConfig(format=formatstr, level=loglevel, filename=self.logfile, datefmt=datefmtstr)
             
     def exp(self):
         logging.debug("Debug message")

@@ -20,14 +20,43 @@ Arguments:
 
 #-------- Standard packages
 import argparse
+import logging
 
 #-------- My packages
 from getipErrors import TimeoutGetIPError, BadDataGetIPError, UnknownIPSourceGetIPError, UnknownErrGetIPError
 
-
+class GetIP_class:
+    
+    def __init__(self, args):
+        self.logfile = args.logfile
+        self.alertemail = args.alertemail
+        self.debug = args.debug
+        self.install = args.install
+        self.ipfile = args.ipfile
+        self.test = args.test
+        
+        # initiate logger
+        formatstr = '%(asctime)s:%(levelname)s -> %(message)s' 
+        loglevel = logging.INFO
+        if (self.debug):
+            loglevel = logging.DEBUG
+            # We also print to stdout in debug mode!!
+            logging.basicConfig(format=formatstr, level=loglevel, datefmt='%m/%d/%Y %I:%M:%S %p')
+        else:
+            logging.basicConfig(format=formatstr, level=loglevel, filename=self.logfile, datefmt='%m/%d/%Y %I:%M:%S %p')
+            
+    def exp(self):
+        logging.debug("Debug message")
+        logging.info("Number {} was chosen".format(1234))
+        logging.warn("IP Changed!!")
+        logging.error("OMG!!  Exception!!")
+        logging.critical("Gack!")
+        
+        
 
 # Set up args -----------------------------
 description = "getIP v0.1\n"
+description += "(c) 2017 Michael Rich (Twitter: @miketofet)\n"
 description += "Detects and logs the current external IP of a system.  Intended for use on home-based servers."
 
 parser = argparse.ArgumentParser(description=description)
@@ -42,3 +71,6 @@ parser.add_argument('--alertemail', type=str, help='Designate the email to recei
 # And GO!
 
 args = parser.parse_args()
+ipgetter = GetIP_class(args)
+ipgetter.exp()
+

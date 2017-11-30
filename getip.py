@@ -21,6 +21,9 @@ Arguments:
 #-------- Standard packages
 import argparse
 import logging
+import smtplib
+from email.mime.text import MIMEText
+import socket
 
 #-------- My packages
 import retrip
@@ -59,6 +62,22 @@ class GetIP_class:
         logging.error("OMG!!  Exception!!")
         logging.critical("Gack!")
         
+    def sendAlertEmail(self, subject, body):
+        try:
+            msg = MIMEText(text)
+            to = self.alertemail
+            frm = "getip"
+            msg['Subject'] = subject
+            msg['From'] = frm
+            msg['To'] = to
+            s = smtplib.SMTP('localhost')
+            s.sendmail(frm, [to], msg.as_string())
+            s.quit()
+            logging.info("Email sent to {}".format(to))
+        except BaseException as badnews:
+            logging.error("Failed to send alert email because: {}".format(badnews))     
+            
+    
     def go(self):
         # check for desire for list of sources
          if (self.list):
@@ -71,6 +90,57 @@ class GetIP_class:
         try:
             logging.debug("getip.go: Started try block")
             currentip = retrip.retrip(self.source, self.ipv)
+            logging.info("Host {} returned IP: {}".format(self.source, currentip))
+            
+            #Check the ipfile for last ip
+            try:
+                f = open(self.ipfile, 'r')
+                oldip = f.readline().strip()
+                if (oldip == currentip):
+                    logging.info("New IP: {} matches old IP {}.".format(currentip, oldip))
+                    f.close()
+                else:
+                    logging.warn("New IP: {} does NOT match old IP: {}.  Reset your DNS records!".format(currentip, oldip))
+                    if (self.alertemail):
+                        logging.debug("Attempting to send alert email to: {}".format(self.alertemail))
+                        self.sendAlertEmail("IP address change!!", "The IP address for {} has changed to {}".format(socket.gethostname(), currentip))
+                    # reopen file to overwrite
+                    f = open(self.ipfile, 'w')
+                    logging.debug("opened ipfile for writing")
+                    f.write(currentip + "\n")
+                    f.close()
+                    logging.debug("wrote {} to ipfile".format(currentip))
+            except IOerror as badnews:
+                try:
+                    if (badnews.errno == 2):
+                        # No existing ip file
+                        logging.info("No existing ipfile, establishing initial entry with ip = {}".format(currentip))
+                        f = open(self.ipfile, 'w')
+                        logging.debug("opened ipfile for writing")
+                        f.write(currentip + "\n")
+                        f.close()
+                        logging.debug("wrote {} to ipfile".format(currentip))
+                    else:
+                        logging.error("Failed ipfile check because: {}".format(badnews))
+                except BaseException as rllybadnews:
+                    logging.error("Failed to create initial ipfile because: {}".format(rllybadnews))
+            except BaseExceptionError as badnews:
+                logging.error("Failed ipfile check because: {}".format(badnews))
+        
+        # Failures to get ip                        
+        except TimeoutGetIPError as timeout:
+            logging.error("Timeout while trying to get data from: {}".format(timeout.host()))
+            # Really should retry several times and then send alert email, but not putting this in here
+        except BadDataGetIPError as baddata:
+            logging.error("Source {} returned bad data that looked like: {}".format(baddata.host, baddata.retdata))
+            # email?
+        except UnknownIPSourceGetIPError as unksource:
+            logging.error("Source {} is not valid!".format(unksource.host))
+        except UnknownErrGetIPError as unkerr:
+            logging.error("getip failed because: {}".format(unkerr.msg))
+        except BaseException as badnews:
+            logging.error("getip failed because: {}".format(unkerr.msg))
+            
         
         
                

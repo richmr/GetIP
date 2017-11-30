@@ -90,15 +90,15 @@ class GetIP_class:
         try:
             logging.debug("getip.go: Started try block")
             currentip = retrip.retrip(self.source, self.ipv)
-            logging.info("Host {} returned IP: {}".format(self.source, currentip))
+            logging.info("Source {} returned IP: {}".format(self.source, currentip))
             
             #Check the ipfile for last ip
             try:
                 f = open(self.ipfile, 'r')
                 oldip = f.readline().strip()
+                f.close()
                 if (oldip == currentip):
                     logging.info("New IP: {} matches old IP {}.".format(currentip, oldip))
-                    f.close()
                 else:
                     logging.warn("New IP: {} does NOT match old IP: {}.  Reset your DNS records!".format(currentip, oldip))
                     if (self.alertemail):

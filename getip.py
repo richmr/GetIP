@@ -139,7 +139,7 @@ class GetIP_class:
         except UnknownErrGetIPError as unkerr:
             logging.error("getip failed because: {}".format(unkerr.msg))
         except BaseException as badnews:
-            logging.error("getip failed because: {}".format(unkerr.msg))
+            logging.error("getip failed because: {}".format(badnews.msg))
             
         
         

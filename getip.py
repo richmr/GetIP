@@ -184,5 +184,5 @@ parser.add_argument('--ipv6', action='store_true', help='Retrieve a IPv6 result,
 
 args = parser.parse_args()
 ipgetter = GetIP_class(args)
-ipgetter.go()
+ipgetter.start()
 

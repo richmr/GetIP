@@ -87,7 +87,12 @@ def retrip_ifconfig(ipv):
         raise UnknownErrGetIPError("retrip_ifconfig: Sorry ifconfig.me only returns IPv4 results")
     
     try:
-        resp = urllib2.urlopen("http://ifconfig.me/ip", timeout=15).read().rstrip()
+        # UA: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"
+        # Had to set it to match what my Firefox browser was putting out because ifconfig.me got ornery
+        request = urllib2.Request("http://ifconfig.me/ip")
+        opener = urllib2.build_opener()
+        request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0')
+        resp = opener.open(request).read() 
         return resp
     except socket.timeout:
         # Recast as GetIPError

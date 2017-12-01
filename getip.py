@@ -88,7 +88,7 @@ class GetIP_class:
             return
         
         # initiate logger
-        formatstr = '%(asctime)s:%(levelname)s -> %(message)s'
+        formatstr = '(%(asctime)s) %(levelname)s-> %(message)s'
         datefmtstr = '%m/%d/%Y %H:%M:%S'
         loglevel = logging.INFO
         if (self.debug):

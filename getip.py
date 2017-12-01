@@ -24,6 +24,8 @@ import logging
 import smtplib
 from email.mime.text import MIMEText
 import socket
+from time import sleep
+import signal
 
 #-------- My packages
 import retrip
@@ -41,8 +43,11 @@ class GetIP_class:
         self.list = args.list
         self.source = args.source
         self.ipv = "IPv6" if args.ipv6 else "IPv4"
+        self.stop = False
         
-       
+        if (self.test):
+            self.debug=True
+              
         
         # initiate logger
         formatstr = '%(asctime)s:%(levelname)s -> %(message)s'
@@ -64,7 +69,7 @@ class GetIP_class:
         
     def sendAlertEmail(self, subject, body):
         try:
-            msg = MIMEText(text)
+            msg = MIMEText(body)
             to = self.alertemail
             frm = "getip"
             msg['Subject'] = subject
@@ -77,15 +82,28 @@ class GetIP_class:
         except BaseException as badnews:
             logging.error("Failed to send alert email because: {}".format(badnews))     
             
+    def sighandle(self, signal, frame):
+        logging.debug("SIGINT received.")
+        self.stop = True
+        
     
-    def go(self):
-        # check for desire for list of sources
-         if (self.list):
+    def start(self):
+        if (self.list):
             print "Available IP data sources:"
             print "--------------------------"
             print "{}".format(retrip.retrip_list())
             return
         
+        if (self.test):
+            logging.debug("Entering test mode.  Will check IP using source {} once every {} seconds".format(self.source, self.test))
+            signal.signal(signal.SIGINT, self.sighandle)
+            while (not self.stop):
+                self.go()
+                sleep(self.test)
+        else:
+            self.go()
+    
+    def go(self):
         # Start try block
         try:
             logging.debug("getip.go: Started try block")
@@ -110,7 +128,7 @@ class GetIP_class:
                     f.write(currentip + "\n")
                     f.close()
                     logging.debug("wrote {} to ipfile".format(currentip))
-            except IOerror as badnews:
+            except IOError as badnews:
                 try:
                     if (badnews.errno == 2):
                         # No existing ip file
@@ -124,7 +142,7 @@ class GetIP_class:
                         logging.error("Failed ipfile check because: {}".format(badnews))
                 except BaseException as rllybadnews:
                     logging.error("Failed to create initial ipfile because: {}".format(rllybadnews))
-            except BaseExceptionError as badnews:
+            except BaseException as badnews:
                 logging.error("Failed ipfile check because: {}".format(badnews))
         
         # Failures to get ip                        
@@ -141,10 +159,7 @@ class GetIP_class:
         except BaseException as badnews:
             logging.error("getip failed because: {}".format(badnews.msg))
             
-        
-        
-               
-        
+# End GetIP_class def
 
 # Set up args -----------------------------
 description = "getIP v0.1\n"
@@ -155,8 +170,7 @@ parser = argparse.ArgumentParser(description=description)
 parser.add_argument('-l', '--logfile', type=str, default='/var/log/getip/getip.log', help='Designate the logfile. Default is /var/log/getip/getip.log')
 parser.add_argument('-i', '--ipfile', type=str, default='/var/log/getip/.currentip', help='Designate the file where the last detected IP is stored.  Default is /var/log/getip/.currentip')
 parser.add_argument('--debug', action='store_true', help='Enable all debugging log messages')
-onceAnHour = 60*60
-parser.add_argument('--test', type=int, default=onceAnHour, help='Launch getip in test mode.  Getip will check the IP every t seconds.  Default is once an hour.  This also enable --debug')
+parser.add_argument('--test', type=int, help='Launch getip in test mode.  Getip will check the IP every t seconds.  This also enable --debug')
 parser.add_argument('--install', action='store_true', help='Install getip.  Run as root.')
 parser.add_argument('--alertemail', type=str, help='Designate the email to receive an alert when the public IP changes')
 parser.add_argument('--source', type=str, default="ifconfig.me", help="Designate source of ip data.  Use --list to see a list of sources")

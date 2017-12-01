@@ -175,7 +175,6 @@ parser.add_argument('-l', '--logfile', type=str, default='/var/log/getip/getip.l
 parser.add_argument('-i', '--ipfile', type=str, default='/var/log/getip/.currentip', help='Designate the file where the last detected IP is stored.  Default is /var/log/getip/.currentip')
 parser.add_argument('--debug', action='store_true', help='Enable all debugging log messages')
 parser.add_argument('--test', type=int, help='Launch getip in test mode.  Getip will check the IP every t seconds.  This also enable --debug')
-parser.add_argument('--install', action='store_true', help='Install getip.  Run as root.')
 parser.add_argument('--alertemail', type=str, help='Designate the email to receive an alert when the public IP changes')
 parser.add_argument('--source', type=str, default="ifconfig.me", help="Designate source of ip data.  Use --list to see a list of sources")
 parser.add_argument('--list', action='store_true', help='Get a list of possible ip data sources')

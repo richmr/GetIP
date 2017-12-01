@@ -51,16 +51,7 @@ class GetIP_class:
             self.debug=True
               
         
-        # initiate logger
-        formatstr = '%(asctime)s:%(levelname)s -> %(message)s'
-        datefmtstr = '%m/%d/%Y %H:%M:%S'
-        loglevel = logging.INFO
-        if (self.debug):
-            loglevel = logging.DEBUG
-            # We also print to stdout in debug mode!!
-            logging.basicConfig(format=formatstr, level=loglevel, datefmt=datefmtstr)
-        else:
-            logging.basicConfig(format=formatstr, level=loglevel, filename=self.logfile, datefmt=datefmtstr)
+        
             
     def exp(self):
         logging.debug("Debug message")
@@ -95,6 +86,17 @@ class GetIP_class:
             print "--------------------------"
             print "{}".format(retrip.retrip_list())
             return
+        
+        # initiate logger
+        formatstr = '%(asctime)s:%(levelname)s -> %(message)s'
+        datefmtstr = '%m/%d/%Y %H:%M:%S'
+        loglevel = logging.INFO
+        if (self.debug):
+            loglevel = logging.DEBUG
+            # We also print to stdout in debug mode!!
+            logging.basicConfig(format=formatstr, level=loglevel, datefmt=datefmtstr)
+        else:
+            logging.basicConfig(format=formatstr, level=loglevel, filename=self.logfile, datefmt=datefmtstr)
         
         if (self.test):
             logging.debug("Entering test mode.  Will check IP using source {} once every {} seconds".format(self.source, self.test))

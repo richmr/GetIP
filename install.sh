@@ -6,6 +6,7 @@ if [ "$1" != "" ]; then
 else
     echo "Please specify an email to send alert messages to."
     echo "Example: "$0" myemail@email.com"
+    exit 1
 fi
 
 

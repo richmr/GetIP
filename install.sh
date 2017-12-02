@@ -16,11 +16,11 @@ if ! [ $(id -u) = 0 ]; then
    exit 1
 fi
 
-#mkdir /usr/bin/getip
-#cp *.py /usr/bin/getip
-#mkdir /var/log/getip
+mkdir /usr/bin/getip
+cp *.py /usr/bin/getip
+mkdir /var/log/getip
 
-#echo -e '#!/bin/bash\n\npython /usr/bin/getip/getip.py --source "ifconfig.me" --alertemail "'$1'"' > /etc/cron.daily/getip
-#chmod u+x /etc/cron.daily/getip
+echo -e '#!/bin/bash\n\npython /usr/bin/getip/getip.py --source "ifconfig.me" --alertemail "'$1'"' > /etc/cron.daily/getip
+chmod u+x /etc/cron.daily/getip
 
 
